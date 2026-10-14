@@ -1,18 +1,14 @@
 
 const API='https://api.mcsrvstat.us/3/mc.preservedrealm.online';
-async function updateServerStatus(){
- const statusEl=document.querySelectorAll('[data-status]');
- const onlineEl=document.querySelectorAll('[data-online]');
- const maxEl=document.querySelectorAll('[data-max]');
- try{
-  const response=await fetch(API,{cache:'no-store'});
-  if(!response.ok) throw new Error('status unavailable');
-  const data=await response.json();
-  statusEl.forEach(el=>{el.textContent=data.online?'Сервер онлайн':'Сервер офлайн';const dot=el.querySelector('.dot');if(dot)dot.classList.toggle('off',!data.online);});
-  onlineEl.forEach(el=>el.textContent=data.online&&data.players?data.players.online:'—');
-  maxEl.forEach(el=>el.textContent=data.online&&data.players?data.players.max:'—');
- }catch(e){statusEl.forEach(el=>{el.textContent='Статус временно недоступен';const dot=el.querySelector('.dot');if(dot)dot.classList.add('off')});onlineEl.forEach(el=>el.textContent='—');maxEl.forEach(el=>el.textContent='—')}
-}
-document.querySelectorAll('[data-copy-ip]').forEach(btn=>btn.addEventListener('click',async()=>{try{await navigator.clipboard.writeText('mc.preservedrealm.online');btn.textContent='Скопировано ✓';setTimeout(()=>btn.textContent='Копировать IP',1800)}catch(e){window.prompt('Скопируй IP сервера:','mc.preservedrealm.online')}}));
+async function updateServerStatus(){const sts=document.querySelectorAll('[data-status]'),on=document.querySelectorAll('[data-online]'),max=document.querySelectorAll('[data-max]');try{const r=await fetch(API,{cache:'no-store'});if(!r.ok)throw 0;const d=await r.json();sts.forEach(e=>{e.textContent=d.online?'Сервер онлайн':'Сервер офлайн';e.querySelector('.dot')?.classList.toggle('off',!d.online)});on.forEach(e=>e.textContent=d.online&&d.players?d.players.online:'—');max.forEach(e=>e.textContent=d.online&&d.players?d.players.max:'—')}catch(e){sts.forEach(e=>{e.textContent='Статус временно недоступен';e.querySelector('.dot')?.classList.add('off')});on.forEach(e=>e.textContent='—');max.forEach(e=>e.textContent='—')}}
+const toast=document.querySelector('.toast');let toastTimer;
+document.querySelectorAll('[data-copy-ip]').forEach(b=>b.addEventListener('click',async()=>{try{await navigator.clipboard.writeText('mc.preservedrealm.online');if(toast){toast.textContent='IP скопирован в буфер';toast.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.classList.remove('show'),1800)}document.querySelectorAll('[data-copy-ip]').forEach(x=>{x.dataset.old=x.innerHTML;x.innerHTML='✓ Скопировано';setTimeout(()=>x.innerHTML=x.dataset.old||'Копировать IP',1500)})}catch(e){window.prompt('Скопируй IP сервера:','mc.preservedrealm.online')}}));
 const toggle=document.querySelector('.mobile-toggle');if(toggle)toggle.addEventListener('click',()=>document.querySelector('.links')?.classList.toggle('open'));
+const root=document.documentElement;window.addEventListener('pointermove',e=>{root.style.setProperty('--mx',e.clientX+'px');root.style.setProperty('--my',e.clientY+'px');document.querySelectorAll('.feature').forEach(card=>{const r=card.getBoundingClientRect();card.style.setProperty('--mx',(e.clientX-r.left)+'px');card.style.setProperty('--my',(e.clientY-r.top)+'px')})},{passive:true});
+const particleBox=document.querySelector('.particles');if(particleBox&&!matchMedia('(prefers-reduced-motion: reduce)').matches){for(let i=0;i<28;i++){const p=document.createElement('i');p.className='particle';p.style.left=(Math.random()*100)+'%';p.style.bottom=(-Math.random()*100)+'px';p.style.setProperty('--drift',((Math.random()-.5)*180)+'px');p.style.animationDuration=(9+Math.random()*17)+'s';p.style.animationDelay=(-Math.random()*22)+'s';p.style.opacity=(.15+Math.random()*.3);particleBox.appendChild(p)}}
+const revealEls=document.querySelectorAll('.reveal');if('IntersectionObserver'in window){const io=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target)}}),{threshold:.12});revealEls.forEach(e=>io.observe(e))}else revealEls.forEach(e=>e.classList.add('visible'));
+const tilt=document.querySelector('[data-tilt]');if(tilt&&matchMedia('(pointer:fine)').matches){tilt.addEventListener('pointermove',e=>{const r=tilt.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;tilt.style.transform=`perspective(900px) rotateY(${x*5}deg) rotateX(${-y*5}deg) translateY(-2px)`});tilt.addEventListener('pointerleave',()=>tilt.style.transform='')}
+document.querySelectorAll('.rule-heading').forEach(btn=>btn.addEventListener('click',()=>{const c=btn.nextElementSibling,open=btn.getAttribute('aria-expanded')==='true';btn.setAttribute('aria-expanded',String(!open));c.hidden=open}));
+const search=document.querySelector('#rule-search');if(search){const sections=[...document.querySelectorAll('.rule-section')],count=document.querySelector('#rule-count');search.addEventListener('input',()=>{const q=search.value.trim().toLocaleLowerCase('ru');let visible=0;sections.forEach(s=>{const match=s.textContent.toLocaleLowerCase('ru').includes(q);s.hidden=!match;if(match){visible++;s.querySelector('.rule-content').hidden=!!q?s.querySelector('.rule-content').hidden:false}});if(count)count.textContent=visible+' разделов'})}
+const back=document.querySelector('.backtop');if(back){window.addEventListener('scroll',()=>back.classList.toggle('show',window.scrollY>500),{passive:true});back.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}))}
 updateServerStatus();setInterval(updateServerStatus,60000);
